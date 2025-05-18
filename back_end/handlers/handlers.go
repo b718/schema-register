@@ -38,6 +38,20 @@ type FetchSchemasResponse struct {
 	Schemas    []databaseClient.Schema `json:"schemas"`
 }
 
+type DeleteSchemaResponse struct {
+	StatusCode int    `json:"statusCode"`
+	Message    string `json:"message"`
+}
+
+type UpdateSchemaRequest struct {
+	Schema json.RawMessage `json:"schema"`
+}
+
+type UpdateSchemaResponse struct {
+	StatusCode int    `json:"statusCode"`
+	Message    string `json:"message"`
+}
+
 func InsertSchemas(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -106,6 +120,79 @@ func FetchSchemas(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(FetchSchemasResponse{
 		StatusCode: http.StatusOK,
 		Schemas:    schemas,
+	})
+}
+
+func DeleteSchema(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "DELETE" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract schemaId from URL path
+	schemaId := r.URL.Path[len("/delete-schema/"):]
+	if schemaId == "" {
+		http.Error(w, "Schema ID is required", http.StatusBadRequest)
+		return
+	}
+
+	databaseClient, err := databaseClient.NewDatabaseClient(sqlConnectionLink)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to connect to database: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	err = databaseClient.DeleteSchema(schemaId)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to delete schema: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(DeleteSchemaResponse{
+		StatusCode: http.StatusOK,
+		Message:    fmt.Sprintf("Schema %s deleted successfully", schemaId),
+	})
+}
+
+func UpdateSchema(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "PUT" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract schemaId from URL path
+	schemaId := r.URL.Path[len("/update-schema/"):]
+	if schemaId == "" {
+		http.Error(w, "Schema ID is required", http.StatusBadRequest)
+		return
+	}
+
+	var updateRequest struct {
+		Schema json.RawMessage `json:"schema"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&updateRequest); err != nil {
+		http.Error(w, fmt.Sprintf("Failed to decode request body: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	databaseClient, err := databaseClient.NewDatabaseClient(sqlConnectionLink)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to connect to database: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	err = databaseClient.UpdateSchema(schemaId, updateRequest.Schema)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to update schema: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(UpdateSchemaResponse{
+		StatusCode: http.StatusOK,
+		Message:    fmt.Sprintf("Schema %s updated successfully", schemaId),
 	})
 }
 

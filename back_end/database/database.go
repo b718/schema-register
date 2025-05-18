@@ -69,6 +69,30 @@ func (databaseClient *DatabaseClient) InsertSchema(schemaName string, schemaDefi
 	return nil
 }
 
+func (databaseClient *DatabaseClient) DeleteSchema(schemaId string) error {
+	query := `
+	DELETE FROM valid_schemas WHERE id = ?
+	`
+	_, err := databaseClient.dataBaseClient.Exec(query, schemaId)
+	if err != nil {
+		return fmt.Errorf("failed to delete schema within DeleteSchema: %w", err)
+	}
+
+	return nil
+}
+
+func (databaseClient *DatabaseClient) UpdateSchema(schemaId string, schemaDefinition json.RawMessage) error {
+	query := `
+	UPDATE valid_schemas SET schema_definition = ? WHERE id = ?
+	`
+	_, err := databaseClient.dataBaseClient.Exec(query, schemaDefinition, schemaId)
+	if err != nil {
+		return fmt.Errorf("failed to update schema within UpdateSchema: %w", err)
+	}
+
+	return nil
+}
+
 func (databaseClient *DatabaseClient) createTable() error {
 	query := `
 	CREATE TABLE IF NOT EXISTS valid_schemas(

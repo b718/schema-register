@@ -263,3 +263,83 @@
   border-radius: 8px;
   padding: 2rem;
 }
+
+.button-container {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.json-error {
+  color: var(--error-color);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Enhanced Error Messages and Validation */
+.json-error,
+.error-message {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.json-error {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #d32f2f;
+  border-left: 4px solid #d32f2f;
+}
+
+.json-error::before {
+  content: "⚠️";
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+.error-message {
+  background-color: rgba(244, 67, 54, 0.15);
+  color: #c62828;
+  border-left: 4px solid #c62828;
+  margin-bottom: 12px;
+}
+
+.error-message::before {
+  content: "❌";
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+/* Animation for error messages */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhance the invalid JSON textarea styling */
+.form-textarea.invalid-json {
+  border-color: #d32f2f;
+  background-color: rgba(244, 67, 54, 0.05);
+  box-shadow: 0 0 0 1px #d32f2f;
+}
+
+.form-textarea.invalid-json:focus {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.25);
+}

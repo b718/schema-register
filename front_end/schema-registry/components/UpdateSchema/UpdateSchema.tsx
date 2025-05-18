@@ -1,26 +1,23 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Modal from "../Modal/Modal";
 import "../../styles/components.css";
-import { submitSchema } from "./utilities/submitSchema";
-
+import { updateSchema } from "./utilities/updateSchema";
 interface FormData {
-  name: string;
-  version: string;
+  id: string;
   schema: string;
 }
 
-interface AddNewSchemaProps {
+interface UpdateSchemaProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
 const initialFormData: FormData = {
-  name: "",
-  version: "",
+  id: "",
   schema: "",
 };
 
-const AddNewSchema: React.FC<AddNewSchemaProps> = ({ isOpen, onClose }) => {
+const UpdateSchema: React.FC<UpdateSchemaProps> = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [error, setError] = useState<string | null>(null);
   const [isValidJSON, setIsValidJSON] = useState(true);
@@ -89,12 +86,7 @@ const AddNewSchema: React.FC<AddNewSchemaProps> = ({ isOpen, onClose }) => {
 
     try {
       const parsedJSON = JSON.parse(formData.schema);
-      const formattedData = {
-        ...formData,
-        schema: parsedJSON,
-      };
-
-      await submitSchema(formattedData);
+      await updateSchema(formData.id, parsedJSON);
       onClose();
       setFormData(initialFormData);
       setError(null);
@@ -104,32 +96,17 @@ const AddNewSchema: React.FC<AddNewSchemaProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Add New Schema">
+    <Modal isOpen={isOpen} onClose={onClose} title="Update Schema">
       <form onSubmit={handleSubmit} className="form-container">
         <div className="form-group">
-          <label htmlFor="name" className="form-label">
-            Schema Name:
+          <label htmlFor="id" className="form-label">
+            Schema ID:
           </label>
           <input
             type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="form-input"
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="version" className="form-label">
-            Version:
-          </label>
-          <input
-            type="text"
-            id="version"
-            name="version"
-            value={formData.version}
+            id="id"
+            name="id"
+            value={formData.id}
             onChange={handleChange}
             className="form-input"
             required
@@ -166,9 +143,7 @@ const AddNewSchema: React.FC<AddNewSchemaProps> = ({ isOpen, onClose }) => {
             required
           />
           {!isValidJSON && (
-            <div className="json-error">
-              Invalid JSON format. Please check your syntax.
-            </div>
+            <div className="json-error">Please enter valid JSON</div>
           )}
           {error && <div className="error-message">{error}</div>}
         </div>
@@ -190,4 +165,4 @@ const AddNewSchema: React.FC<AddNewSchemaProps> = ({ isOpen, onClose }) => {
   );
 };
 
-export default AddNewSchema;
+export default UpdateSchema;

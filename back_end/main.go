@@ -37,6 +37,8 @@ func main() {
 	// Wrap handlers with CORS middleware
 	server.HandleFunc("/insert-schemas", enableCORS(handlers.InsertSchemas))
 	server.HandleFunc("/fetch-schemas", enableCORS(handlers.FetchSchemas))
+	server.HandleFunc("/delete-schema/{schemaId}", enableCORS(handlers.DeleteSchema))
+	server.HandleFunc("/update-schema/{schemaId}", enableCORS(handlers.UpdateSchema))
 	server.HandleFunc("/", enableCORS(handlers.HelloWorld))
 
 	// Start the server in a goroutine

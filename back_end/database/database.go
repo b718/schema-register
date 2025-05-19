@@ -58,10 +58,15 @@ func (databaseClient *DatabaseClient) GetSchemas() ([]Schema, error) {
 }
 
 func (databaseClient *DatabaseClient) InsertSchema(schemaName string, schemaDefinition json.RawMessage) error {
+	err := databaseClient.createTable()
+	if err != nil {
+		return fmt.Errorf("failed to create table within InsertSchema: %w", err)
+	}
+
 	query := `
 	INSERT INTO valid_schemas (name, schema_definition) VALUES (?, ?)
 	`
-	_, err := databaseClient.dataBaseClient.Exec(query, schemaName, schemaDefinition)
+	_, err = databaseClient.dataBaseClient.Exec(query, schemaName, schemaDefinition)
 	if err != nil {
 		return fmt.Errorf("failed to insert schema within InsertSchema: %w", err)
 	}
@@ -70,10 +75,15 @@ func (databaseClient *DatabaseClient) InsertSchema(schemaName string, schemaDefi
 }
 
 func (databaseClient *DatabaseClient) DeleteSchema(schemaId string) error {
+	err := databaseClient.createTable()
+	if err != nil {
+		return fmt.Errorf("failed to create table within DeleteSchema: %w", err)
+	}
+
 	query := `
 	DELETE FROM valid_schemas WHERE id = ?
 	`
-	_, err := databaseClient.dataBaseClient.Exec(query, schemaId)
+	_, err = databaseClient.dataBaseClient.Exec(query, schemaId)
 	if err != nil {
 		return fmt.Errorf("failed to delete schema within DeleteSchema: %w", err)
 	}
@@ -82,10 +92,15 @@ func (databaseClient *DatabaseClient) DeleteSchema(schemaId string) error {
 }
 
 func (databaseClient *DatabaseClient) UpdateSchema(schemaId string, schemaDefinition json.RawMessage) error {
+	err := databaseClient.createTable()
+	if err != nil {
+		return fmt.Errorf("failed to create table within UpdateSchema: %w", err)
+	}
+
 	query := `
 	UPDATE valid_schemas SET schema_definition = ? WHERE id = ?
 	`
-	_, err := databaseClient.dataBaseClient.Exec(query, schemaDefinition, schemaId)
+	_, err = databaseClient.dataBaseClient.Exec(query, schemaDefinition, schemaId)
 	if err != nil {
 		return fmt.Errorf("failed to update schema within UpdateSchema: %w", err)
 	}
